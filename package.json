@@ -1,0 +1,19 @@
+{
+  "name": "pip",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/foram144/PIP.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/foram144/PIP/issues"
+  },
+  "homepage": "https://github.com/foram144/PIP#readme"
+}
