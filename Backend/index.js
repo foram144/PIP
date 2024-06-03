@@ -1,21 +1,19 @@
 const restify = require('restify');
 const fs = require('fs');
 const path = require('path');
+const { StatusCodes } = require('http-status-codes');
 
 const server = restify.createServer();
 
-server.use(restify.plugins.bodyParser());
+server.get('/', (req, res, next) => {
+    res.send(StatusCodes.OK, { message: 'Welcome to the User Management API' });
+    next();
+});
 
-const DATA_FILE = path.join(__dirname, 'users.csv');
-
-const readCSV = () => {
-
-    const data = fs.readFileSync(DATA_FILE, 'utf8');
-    return data.trim().split('\n').filter(line => line).map(line => {
-        const [id, name, surname] = line.split(',');
-        return { id, name, surname };
-    });
-};
+server.get('/health', (req, res, next) => {
+    res.send(StatusCodes.OK, { status: StatusCodes.OK });
+    next();
+});
 
 server.listen(8080, () => {
     console.log('Server is listening on port 8080');
