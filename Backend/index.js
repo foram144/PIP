@@ -45,7 +45,7 @@ server.get('/users/:id', (req, res, next) => {
     const users = readCSV();
     const user = users.find(u => u.id === req.params.id);
     if (user) {
-        res.send(StatusCodes.OK, user);
+        res.send(StatusCodes.OK, [user]);
     } else {
         res.send(StatusCodes.NOT_FOUND, { message: 'User not found' });
     }
@@ -58,16 +58,25 @@ server.post('/users', (req, res, next) => {
         res.send(StatusCodes.BAD_REQUEST, { message: 'Name and surname are required' });
         return next();
     }
+
+    const allowedFields = ['name', 'surname'];
+    const unexpectedFields = Object.keys(req.body).filter(key => !allowedFields.includes(key));
+
+    if (unexpectedFields.length > 0) {
+        res.send(StatusCodes.BAD_REQUEST, { message: `Unexpected fields: ${unexpectedFields.join(', ')}` });
+        return next();
+    }
+
     const users = readCSV();
     const id = (users.length ? Math.max(...users.map(u => parseInt(u.id))) + 1 : 1).toString();
     const user = { id, name, surname };
 
-    if (users.some(u => u.name === name && u.surname === surname)) {
+    if (users.some(u => u.name.toLowerCase() === name.toLowerCase() && u.surname.toLowerCase() === surname.toLowerCase())) {
         res.send(StatusCodes.CONFLICT, { message: 'User already exists' });
     } else {
         users.push(user);
         writeCSV(users);
-        res.send(StatusCodes.CREATED, user);
+        res.send(StatusCodes.CREATED, [user]);
     }
     next();
 });
