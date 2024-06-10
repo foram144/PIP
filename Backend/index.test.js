@@ -1,44 +1,110 @@
 const assert = require('assert');
-const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const server = require('./index');
+const supertest = require('supertest');
+const { StatusCodes } = require('http-status-codes');
 
-const DATA_FILE = path.join(__dirname, '../users.csv');
+const DATA_FILE = path.join(__dirname, '..', 'users.csv');
 
-const makeRequest = (options, data, callback) => {
-    const req = http.request(options, (res) => {
-         let body = '';
-         res.on('data', chunk => {body += chunk; });
-         res.on('end', () => {callback(null, res, body);});
+beforeEach(() => {
+    fs.writeFileSync(DATA_FILE, '');
+});
+
+const server = require('../Backend/index');
+const request = supertest('http://localhost:8080');
+
+describe('User Management API', function() {
+
+    it('should return a welcome mesage', function(done) {
+        request.get('/')
+            .expect(StatusCodes.OK)
+            .end((err, res) =>{
+                if (err)
+                    return done(err);
+                assert.strictEqual(res.body.message, 'Welcome to the User Management API');
+                done();
+            });
     });
 
-    req.on('error', (e) => {
-        callback(e);
+    it('should return OK status for health check', function(done) {
+        request.get('/health')
+            .expect(StatusCodes.OK)
+            .end((err, res) =>{
+                if (err)
+                    return done(err);
+                assert.strictEqual(res.body.status, StatusCodes.OK);
+                done();
+            });
     });
 
-    if(data) {
-        req.write(data);
-    }
-
-    req.end();
-};
-
-describe('User Management', () => {
-    beforeEach((done) => {
-        fs.writeFileSync(DATA_FILE, '1,duncan,vodden\n2,esti,cronje');
-        server.listen(8080,done);
+    it('should return an empty list of users', function(done) {
+        request.get('/users')
+            .expect(StatusCodes.OK)
+            .end((err, res) =>{
+                if (err)
+                    return done(err);
+                assert(Array.isArray(res.body));
+                assert.strictEqual(res.body.length, 0);
+                done();
+            });
     });
 
-    afterEach((done) => {
-        server.close(done);
+    it('should create a new user', function(done) {
+        const newUser = { name: 'Esti', surname: 'Cronje' };
+        request.post('/users')
+            .send(newUser)
+            .expect(StatusCodes.CREATED)
+            .end((err, res) =>{
+                if (err)
+                    return done(err);
+                assert.strictEqual(res.body.name, newUser.name);
+                assert.strictEqual(res.body.surname, newUser.surname);
+                done();
+            });
     });
 
-    it('should return health status', (done) => {
-        makeRequest({ hostname: 'localhost', port: 8080, path: '/health', method: 'GET' }, null, (err, res, body) => {
-            assert.strictEqual(res.statusCode, 200);
-            assert.deepStrictEqual(JSON.parse(body), { status: 200 });
-            done();
-        });
+    it('should not create a duplicate user', function(done) {
+        const newUser = { name: 'Esti', surname: 'Cronje' };
+        request.post('/users')
+            .send(newUser)
+            .expect(StatusCodes.CONFLICT)
+            .end((err, res) =>{
+                if (err)
+                    return done(err);
+                assert.strictEqual(res.body.message, 'User already exists');
+                done();
+            });
+    });
+
+    it('should return a user by ID', function(done) {
+        const newUser = { name: 'Esti', surname: 'Cronje' };
+        request.post('/users')
+            .send(newUser)
+            .expect(StatusCodes.CREATED)
+            .end((err, res) =>{
+                if (err)
+                    return done(err);
+                const userId = res.body.id;
+                request.get(`/users/${userId}`)
+                    .expect(StatusCodes.OK)
+                    .end((err, res) => {
+                        if (err)
+                            return done(err);
+                        assert.strictEqual(res.body.name, newUser.name);
+                        assert.strictEqual(res.body.surname, newUser.surname);
+                        done();
+                    });
+            });
+    });
+
+    it('should return 404 for a non-existent user by ID', function(done) {
+        request.get('/users/999')
+            .expect(StatusCodes.NOT_FOUND)
+            .end((err, res) =>{
+                if (err)
+                    return done(err);
+                assert.strictEqual(res.body.message, 'User not found');
+                done();
+            });
     });
 });
