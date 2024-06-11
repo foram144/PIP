@@ -1,9 +1,19 @@
 const restify = require('restify');
+const corsMiddleware = require('restify-cors-middleware')
 const fs = require('fs');
 const path = require('path');
 const { StatusCodes } = require('http-status-codes');
 
 const server = restify.createServer();
+
+const cors = corsMiddleware({
+    origins: ['*'],
+    allowHeaders: ['*'],
+    exposeHeaders: ['*']
+  });
+ 
+server.pre(cors.preflight)
+server.use(cors.actual)
 
 server.use(restify.plugins.bodyParser());
 

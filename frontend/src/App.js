@@ -7,7 +7,7 @@ const App = () => {
     const [surname, setSurname] = useState('');
     const [id, setId] = useState('');
     const [users, setUsers] = useState([]);
-    const [user, serUser] = useState(null);
+    const [user, setUser] = useState(null);
 
     const fetchUsers = async () => {
       try {
@@ -17,6 +17,10 @@ const App = () => {
         alert('Error fetching users')
       }
     }
+
+    useEffect(() => {
+      fetchUsers();
+    }, []);
 
     const handleAddUser = async (e) => {
         e.preventDefault();
@@ -42,6 +46,16 @@ const App = () => {
             alert('Error deleting user')
         }
     }
+
+    const handleViewUser = async (e) => {
+      e.preventDefault();
+      try {
+          const response = await axios.get(`http://localhost:8080/users/${id}`);
+          setUser(response.data[0]);
+      } catch (error) {
+          alert('Error fetching user')
+      }
+  } 
     
   return (
     <div className="App">
@@ -67,6 +81,25 @@ const App = () => {
           </label>
           <br/>
           <button type='submit'>Delete user</button>
+      </form>
+
+      <div>
+        <h2>View Users</h2>
+        <ul>
+          {users.map((user) => (
+            <li key={user.id}>{user.name} {user.surname}</li>
+          ))}
+        </ul>
+      </div>
+
+      <form onSubmit={handleViewUser}>
+        <h2>View User</h2>
+        <label>
+          User ID:
+          <input type="text" value={id} onChange={(e) => setId(e.target.value)} />
+        </label>
+        <br />
+        <button type="submit">View User</button>
       </form>
 
       {user && (
