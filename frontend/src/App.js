@@ -5,7 +5,8 @@ import './App.css';
 const App = () => {
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
-    const [id, setId] = useState('');
+    const [deleteId, setDeleteId] = useState('');
+    const [viewId, setViewId] = useState('');
     const [users, setUsers] = useState([]);
     const [user, setUser] = useState(null);
 
@@ -24,36 +25,66 @@ const App = () => {
 
     const handleAddUser = async (e) => {
         e.preventDefault();
+        if ( !name || !surname ) {
+          alert('Name and surname are required');
+          return;
+        }
         try {
-            await axios.post('http://localhost:8080/users', { name, surname });
-            alert('User added successfully');
-            setName('');
-            setSurname('');
-            fetchUsers();
+        await axios.post('http://localhost:8080/users', { name, surname });
+        alert('User added successfully');
+        setName('');
+        setSurname('');
+        fetchUsers();
         } catch (error) {
-            alert('Error adding user')
+          if (error.response && error.response.status === 409) {
+            alert('User alredy exists');
+          } else {
+            alert('Error adding user');
+          }
         }
     };
 
     const handleDeleteUser = async (e) => {
         e.preventDefault();
+        if (!deleteId) {
+          alert('User ID is required');
+          return;
+        }
         try {
-            await axios.delete(`http://localhost:8080/users/${id}`);
+            await axios.delete(`http://localhost:8080/users/${deleteId}`);
             alert('User deleted successfully');
-            setId('');
+            setDeleteId('');
             fetchUsers();
         } catch (error) {
+          if (error.response && error.response.status === 404) {
+            alert('user not found');
+          } else {
             alert('Error deleting user')
+          }
         }
     }
 
     const handleViewUser = async (e) => {
       e.preventDefault();
+      if (!viewId) {
+        alert('User Id is required');
+        return;
+      }
       try {
-          const response = await axios.get(`http://localhost:8080/users/${id}`);
-          setUser(response.data[0]);
+          const response = await axios.get(`http://localhost:8080/users/${viewId}`);
+          if (response.data.length > 0) {
+            setUser(response.data[0]);
+            alert('');
+          } else {
+            setUser(null);
+            alert('user not found');
+          }
       } catch (error) {
+        if (error.response && error.response.status === 404) {
+          alert('user not found');
+        } else {
           alert('Error fetching user')
+        }
       }
   } 
     
@@ -77,26 +108,17 @@ const App = () => {
       <form onSubmit={handleDeleteUser}>
         <h2>Delete User</h2>
         <label>User ID:
-              <input type='text' value={id} onChange={(e) => setId(e.target.value)} />
+              <input type='text' value={deleteId} onChange={(e) => setDeleteId(e.target.value)} />
           </label>
           <br/>
           <button type='submit'>Delete user</button>
       </form>
 
-      <div>
-        <h2>View Users</h2>
-        <ul>
-          {users.map((user) => (
-            <li key={user.id}>{user.name} {user.surname}</li>
-          ))}
-        </ul>
-      </div>
-
       <form onSubmit={handleViewUser}>
         <h2>View User</h2>
         <label>
           User ID:
-          <input type="text" value={id} onChange={(e) => setId(e.target.value)} />
+          <input type="text" value={viewId} onChange={(e) => setViewId(e.target.value)} />
         </label>
         <br />
         <button type="submit">View User</button>
@@ -110,6 +132,17 @@ const App = () => {
               <p>Surname: {user.surname}</p>
           </div>
       )}
+
+      <div>
+        <h2>View Users</h2>
+        <ul>
+        {users.map(user => (
+            <li key={user.id}>
+              {user.name} {user.surname}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
