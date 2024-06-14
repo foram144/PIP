@@ -107,71 +107,70 @@ const App = () => {
   } 
     
   return (
-    <div className='App container mt-5'>
-      <h1 className='text-center mb-4'>User Management</h1>
+    <div className='container'>
+      <h1 className='text-center'>User Management</h1>
 
-      <div className='card mb-4'>
-        <div className='card-header'>
-          <h2>Health Status</h2>
-        </div>
-        <div className='card-body'>
-          <p>{healthStatus}</p>
-        </div>
-      </div>
+          <div className={`card ${healthStatus === 'Healthy' ? 'border-success' : 'border-danger'}`}>
+            <div className={`card-header ${healthStatus === 'Healthy' ? 'bg-success' : 'bg-danger'}`}>
+              <h2>Health Status</h2>
+            </div>
+            <div className='card-body'>
+              <p className={healthStatus === 'Healthy' ? 'healthy' : 'failing'}>{healthStatus}</p>
+            </div>
+          </div>
       
-      <div className='card mb-4'>
-        <div className='card-header'>
+          <div  className='card' style={{borderColor: '#17a2b8'}}>
+          <div className='card-header bg-info'>
           <h3>Add User</h3>
         </div>
         <div className='card-body'>
         <form onSubmit={handleAddUser}>
           <div className='mb-3'>
-            <label>Name:</label>
-            <input type='text' value={name} onChange={(e) => setName(e.target.value)} />
+            <label htmlFor='name' className='form-label'>Name:</label>
+            <input type='text' id='name' className='form-control' value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div className='mb-3'>
-            <label>surname:</label>
-            <input type='text' value={surname} onChange={(e) => setSurname(e.target.value)} />
+            <label htmlFor='surname' className='form-label'>surname:</label>
+            <input type='text' id='surname' className='form-control' value={surname} onChange={(e) => setSurname(e.target.value)} />
           </div>
-          <br/>
-          <button type='submit'>Add user</button>
+          <button type='submit' className='btn btn-primary'>Add user</button>
       </form>
         </div>
-      </div>
+          </div>
 
-      <div className='card mb-4'>
-        <div className='card-header'>
-          <h3>Delete User</h3>
-        </div>
-        <div className='card-body'>
-          <form onSubmit={handleDeleteUser}>
-            <div className='mb-3'>
-              <label>User ID:</label>
-              <input type='text' value={deleteId} onChange={(e) => setDeleteId(e.target.value)} />
-            </div> 
-              <button type='submit'>Delete user</button>
-          </form>
-        </div>
-      </div>
-
-      <div className='card mb-4'>
-        <div className='card-header'>
-          <h3>View User</h3>
-        </div>
-        <div className='card-body'>
-          <form onSubmit={handleViewUser}>
-            <div className='mb-3'>
-              <label>User ID:</label>
-              <input type="text" value={viewId} onChange={(e) => setViewId(e.target.value)} />
+          <div className='card' style={{borderColor: '#ffc107'}}>
+            <div className='card-header bg-warning'>
+              <h3>Delete User</h3>
             </div>
-            <button type="submit">View User</button>
-          </form>
-        </div>
-      </div>
+            <div className='card-body'>
+              <form onSubmit={handleDeleteUser}>
+                <div className='mb-3'>
+                  <label htmlFor='deleteId' className='form-label'>User ID:</label>
+                  <input type='text' id='deleteId' className='form-control' value={deleteId} onChange={(e) => setDeleteId(e.target.value)} />
+                </div> 
+                  <button type='submit' className='btn btn-danger'>Delete user</button>
+              </form>
+            </div>
+          </div>
+
+          <div className='card' style={{borderColor: '#007bff'}}>
+            <div className='card-header bg-primary'>
+              <h3>View User</h3>
+            </div>
+            <div className='card-body'>
+              <form onSubmit={handleViewUser}>
+                <div className='mb-3'>
+                  <label htmlFor='viewId' className='form-label'>User ID:</label>
+                  <input type="text" id='viewId' className='form-control' value={viewId} onChange={(e) => setViewId(e.target.value)} />
+                </div>
+                <button type="submit" className='btn btn-info'>View User</button>
+              </form>
+            </div>
+          </div>
 
       {user && (
-          <div className='card mb-4'>
-            <div className='card-header'>
+          <div className='card' style={{borderColor: '#6c757d'}}>
+            <div className='card-header bg-secondary'>
               <h3>User Details</h3>
             </div>
             <div className='card-body'>
@@ -182,21 +181,21 @@ const App = () => {
           </div>
       )}
 
-      <div className='card mb-4'>
-        <div className='card-header'>
-          <h2>View Users</h2>
+          <div className='card' style={{borderColor: '##343a40'}}>
+            <div className='card-header bg-dark'>
+              <h2>View Users</h2>
+            </div>
+            <div className='card-body'>
+              <ul className='list-group'>
+              {users.map(user => (
+                  <li key={user.id} className='list-group-item'>
+                    {user.id} : {user.name} {user.surname}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
-        <div className='card-body'>
-          <ul className='list-group'>
-          {users.map(user => (
-              <li key={user.id} className='list-group-item'>
-                {user.id} : {user.name} {user.surname}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
   );
 };
 
