@@ -1,5 +1,5 @@
 const restify = require('restify');
-const corsMiddleware = require('restify-cors-middleware')
+const corsMiddleware = require('restify-cors-middleware');
 const fs = require('fs');
 const path = require('path');
 const { StatusCodes } = require('http-status-codes');
@@ -105,6 +105,6 @@ server.del('/users/:id', (req, res, next) => {
     next();
 });
 
-server.listen(8080, () => {
+server.listen(8080, '0.0.0.0', () => {
     console.log('Server is listening on port 8080');
 });
