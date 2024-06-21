@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import './App.css';
 
+const apiUrl = 'http://Ec2Alb-1134731512.eu-north-1.elb.amazonaws.com/';
+
 const App = () => {
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
@@ -15,7 +17,7 @@ const App = () => {
 
     const checkHealth = async () => {
       try {
-        await axios.get('http://localhost:8080/health');
+        await axios.get(`${apiUrl}/health`);
         setHealthStatus('Healthy');
       } catch (error) {
         setHealthStatus('Failing');
@@ -32,7 +34,7 @@ const App = () => {
 
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/users');
+        const response = await axios.get(`${apiUrl}/users`);
         setUsers(response.data[0]);
       } catch (error) {
         alert('Error fetching users')
@@ -50,7 +52,7 @@ const App = () => {
           return;
         }
         try {
-        await axios.post('http://localhost:8080/users', { name, surname });
+        await axios.post(`${apiUrl}/users`, { name, surname });
         alert('User added successfully');
         setName('');
         setSurname('');
@@ -71,7 +73,7 @@ const App = () => {
           return;
         }
         try {
-            await axios.delete(`http://localhost:8080/users/${deleteId}`);
+            await axios.delete(`${apiUrl}/users/${deleteId}`);
             alert('User deleted successfully');
             setDeleteId('');
             fetchUsers();
@@ -91,7 +93,7 @@ const App = () => {
         return;
       }
       try {
-          const response = await axios.get(`http://localhost:8080/users/${viewId}`);
+          const response = await axios.get(`${apiUrl}/users/${viewId}`);
           if (response.data.length > 0) {
             setUser(response.data[0]);
           } else {
