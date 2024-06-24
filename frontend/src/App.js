@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import './App.css';
 
-const apiUrl = 'http://Ec2Alb-1134731512.eu-north-1.elb.amazonaws.com/';
+const apiUrl = 'http://Ec2Alb-1134731512.eu-north-1.elb.amazonaws.com';
 
 const App = () => {
     const [name, setName] = useState('');
